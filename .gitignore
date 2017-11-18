@@ -1,0 +1,12 @@
+*.o
+*.class
+*.txt
+*.exe
+
+#eclipse
+.settings
+.project
+.cproject
+
+#mac
+.DS_Store
