@@ -3,9 +3,9 @@
 #SBATCH --time=0-00:03:00 # run time in days-hh:mm:ss
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=1
-#SBATCH --error=/srv/home/dlhancock/explore_final_project_759/sbatch.err
+#SBATCH --error=/srv/home/dlhancock/final_project_759/sbatch.err
 #SBATCH --ntasks=1
-#SBATCH --output=/srv/home/dlhancock/explore_final_project_759/sbatch.out
+#SBATCH --output=/srv/home/dlhancock/final_project_759/sbatch.out
 ## #SBATCH --gres=gpu:1
 
 function random_unused_port {
