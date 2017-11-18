@@ -63,7 +63,6 @@ public:
 				get_valid_moves(round, state);
 
 				myMove = move();
-				//myMove = generator.nextInt(numValidMoves);        // select a move randomly
 
 				std::stringstream ss;
 				ss << validMoves[myMove] / 8 << "\n" << validMoves[myMove] % 8 << "\n";
@@ -97,9 +96,6 @@ public:
 
 		string s(buffer,result);
 		std::stringstream ss(s);
-
-		//cout << "message: '" << s << "'." << endl;
-		//cout << "result: " << result << endl;
 
 		int i, j;
 		string status;
@@ -150,8 +146,6 @@ public:
 			return false;
 		}
 
-		//cout << "Turn: " << turn << "\n";
-		//cout << "Round: " << round << "\n";
 		cout << "State:\n";
 		for (i = 7; i >= 0; i--) {
 			for (j = 0; j < 8; j++) {
@@ -210,17 +204,6 @@ public:
 
 		return sockfd;
 	}
-
-//		if (p == NULL) {
-//			fprintf(stderr, "client: failed to connect\n");
-//			return 2;
-//		}
-//
-//		inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),s, sizeof s);
-//		printf("client: connecting to %s\n", s);
-//
-//		freeaddrinfo(servinfo); // all done with this structure
-	//}
 
 	void get_valid_moves(int round, int state[8][8]) {
 	        int i, j;
