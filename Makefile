@@ -2,7 +2,7 @@
 WFLAGS	:= #-Wall -Wextra -Wsign-conversion -Wsign-compare
 
 # Optimization and architecture
-OPT		:= -O3
+OPT		:= -O3 -g
 ARCH   	:= -march=native
 
 # Language standard
@@ -13,8 +13,9 @@ CXXSTD	:= -std=c++11
 LDOPT 	:= $(OPT)
 LDFLAGS :=
 
-EXEC	:= client_random_player.exe ReversiServer.class
-OBJS:= client_random_player.o Player.class
+EXEC	:= main.exe ReversiServer.class
+OBJS:= main.o Player.class
+CPPFILES := client_player.cpp client_baseline_minimax.cpp client_random_player.cpp node.cpp main.cpp
 
 .DEFAULT_GOAL := all
 
@@ -24,19 +25,23 @@ debug : LDFLAGS := -fsanitize=address
 debug : ARCH :=
 debug : $(EXEC)
 
-all : Makefile $(EXEC)
+all : Makefile clean $(EXEC)
 
 ReversiServer.class: ReversiServer.java Player.java
 	@ echo Compiling $@...
 	@ javac ReversiServer.java
 	
-client_random_player.exe : client_random_player.o
-	@ echo Building $@...
-	@ $(CXX) -o $@ $<
-	
-client_random_player.o: client_random_player.cpp Makefile
+%.o : %.c $(CPPFILES) Makefile
 	@ echo Compiling $<...
-	@ $(CXX) $(CXXSTD) $(WFLAGS) $(OPT) $(CXXFLAGS) -c $< -o $@
+	$(CC) $(CCSTD) -g $(WFLAGS) $(OPT) $(ARCH) $(CFLAGS) -c $< -o $@
+
+%.o : %.cpp $(CPPFILES) Makefile
+	@ echo Compiling $<...
+	$(CXX) $(CXXSTD) -g $(WFLAGS) $(OPT) $(ARCH) $(CXXFLAGS) -c $< -o $@
+
+main.exe : main.o $(CPPFILES) Makefile
+	@ echo Building $@...
+	@ $(CXX) -g -o $@ $< $(LDFLAGS)
 
 .PHONY: clean
 clean:

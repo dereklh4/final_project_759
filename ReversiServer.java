@@ -205,7 +205,7 @@ public class ReversiServer {
                 }
            }
             
-            System.out.println("[Server] " + "\nBlack: " + t1 + "\nWhite: " + t2);
+            System.out.println("[Server] " + "\nBlack Time: " + t1 + "\nWhite Time: " + t2);
             
             if (mueva[0] != -1) {
                 //System.out.println("Move: " + mueva[0] + ", " + mueva[1]);

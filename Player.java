@@ -175,15 +175,28 @@ public class Player {
                 System.out.println("[ServerPlayer] " + "Receiving moves for player " + me);
                 String s = sin.readLine();
                 s = s.trim();
-                if (s.length() > 1) //temp fix for socket junk
-                    s = s.substring(s.length()-1,s.length());
+                if (s.length() > 1) {//temp fix for socket junk
+                    int start = s.length()-1;
+                    if (s.substring(start-1,start).equals("-")) {
+                        start = s.length()-2;
+                        System.out.println("[ServerPlayer] Adjusting start for -1");
+                    }
+                    s = s.substring(start,s.length());
+                }
                 row = Integer.parseInt(s);
-                System.out.println("    Row: "  + row);
+                System.out.println("[ServerPlayer]    Row: "  + row);
                 
                 s = sin.readLine();
                 s = s.trim();
                 col = Integer.parseInt(s);
-                System.out.println("    Col: "  + col);
+                System.out.println("[ServerPlayer]    Col: "  + col);
+
+                if (row == -1 && col == -1) {
+                    System.out.println("[ServerPlayer] Got -1,-1");
+                    mueva[0] = -1;
+                    mueva[1] = -1;
+                    return mueva;
+                }
                 
                 // check to see whether the move is a valid move
                 for (i = 0; i < numValidMoves; i++) {
@@ -195,8 +208,14 @@ public class Player {
             }
             
             // return the move
-            mueva[0] = row;
-            mueva[1] = col;
+            if (valid) {
+                mueva[0] = row;
+                mueva[1] = col;
+            }
+            else {
+                mueva[0] = -1;
+                mueva[1] = -1;
+            }
         } catch (IOException e) {
             System.err.println("[ServerPlayer] " + "Caught IOException: " + e.getMessage());
         }
