@@ -153,6 +153,7 @@ public:
 					}
 				}
 
+				next_state[(move/8)][(move % 8)] = cur_node->player;
 				updateState(move,cur_node->player,next_state);
 
 				Node* next_node = new Node(!cur_node->isMax, next_player, next_state, cur_node, move);
