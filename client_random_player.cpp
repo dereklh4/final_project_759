@@ -33,6 +33,8 @@ public:
 	int move() {
 		// just move randomly for now
 		std::cout << "[random player] " << "Getting random move\n";
+		int validMoves[64];
+		int numValidMoves = get_valid_moves(state, me, validMoves);
 		if (numValidMoves > 0) {
 			int randomIndex = rand() % numValidMoves;
 

@@ -46,6 +46,9 @@ public:
 
 	int randomMove() {
 		cout << message_prefix << "Returning random move\n";
+		int validMoves[64];
+		int numValidMoves = get_valid_moves(state, me, validMoves);
+
 		cout << message_prefix << "numValidMoves: ";
 		cout << numValidMoves << "\n";
 		int myMove;
@@ -70,7 +73,8 @@ public:
 			std::cout << message_prefix << "Creating minimax tree\n";
 
 			root = new Node(true, me, state, NULL, -1);
-			get_valid_moves(state,me);
+			int validMoves[64];
+			int numValidMoves = get_valid_moves(state, me, validMoves);
 //			std::cout << "Valid moves for root: \n";
 //			for (int i = 0; i < numValidMoves; i++)
 //				std::cout << (validMoves[i]/8) << "," << ( (validMoves[i]%8)) << " ; ";
@@ -101,10 +105,11 @@ public:
 				return randomMove();
 			}
 			else {
-				std::cout << message_prefix << bestNode->moveFromParent << " val: " << bestValue << "\n";
-				get_valid_moves(state,me);
+				int validMoves[64];
+				int numValidMoves = get_valid_moves(state, me, validMoves);
 				int move = validMoves[k];
-				cout << message_prefix << "Returning the best move: " << move << "\n";
+				std::cout << message_prefix << "Best Move: " << (move/8) << "," << (move%8) << " val: " << bestValue << "\n";
+				//cout << message_prefix << "Returning the best move: " << move << "\n";
 				return move;
 			}
 		}
@@ -123,7 +128,8 @@ public:
 
 		if (current_depth < depth_limit) {
 			//cout << "    getting valid moves\n";
-			get_valid_moves(cur_node->state, cur_node->player);
+			int validMoves[64];
+			int numValidMoves = get_valid_moves(cur_node->state, cur_node->player, validMoves);
 
 			//if you reach point where no valid moves, this node would be other player's turn
 			if (numValidMoves == 0) {
@@ -137,8 +143,6 @@ public:
 				return;
 			}
 
-			//create new nodes from validMoves
-			//cout << "    creating new nodes\n";
 			for (int i = 0; i < numValidMoves; i++) {
 				int move = validMoves[i];
 
@@ -149,7 +153,6 @@ public:
 					}
 				}
 
-				next_state[(move/8)][(move % 8)] = cur_node->player;
 				updateState(move,cur_node->player,next_state);
 
 				Node* next_node = new Node(!cur_node->isMax, next_player, next_state, cur_node, move);
@@ -186,10 +189,10 @@ public:
 			int starting_col = (move % 8);
 			int row = starting_row + rdir;
 			int col = starting_col + cdir;
-			if (row > 0 && col > 0 && row < 8 && col < 8 && in_state[row][col] == opponent) {
+			if (row >= 0 && col >= 0 && row < 8 && col < 8 && in_state[row][col] == opponent) {
 				int sequence[8][2];
 				int seq_len = 0;
-				while (row > 0 && col > 0 && row < 8 && col < 8 && in_state[row][col] == opponent) {
+				while (row >= 0 && col >= 0 && row < 8 && col < 8 && in_state[row][col] == opponent) {
 					sequence[seq_len][0] = row;
 					sequence[seq_len][1] = col;
 					seq_len++;
@@ -200,12 +203,13 @@ public:
 					row += rdir;
 					col += cdir;
 				}
-				if (row > 0 && col > 0 && row < 8 && col < 8 && in_state[row][col] == player) {
+				if (row >= 0 && col >= 0 && row < 8 && col < 8 && in_state[row][col] == player) {
 					for (int j = 0; j < seq_len; j++) {
-						int r = sequence[seq_len][0];
-						int c = sequence[seq_len][1];
-						if (r >= 0 && c >= 0 && r < 8 && c < 8)
+						int r = sequence[j][0];
+						int c = sequence[j][1];
+						if (r >= 0 && c >= 0 && r < 8 && c < 8) {
 							in_state[r][c] = player;
+						}
 					}
 				}
 			}
