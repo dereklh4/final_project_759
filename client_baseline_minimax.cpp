@@ -127,7 +127,7 @@ public:
 
 			//if you reach point where no valid moves, this node would be other player's turn
 			if (numValidMoves == 0) {
-				cout << message_prefix << " No valid moves at this node \n";
+				//cout << message_prefix << " No valid moves at this node \n";
 
 				//discourage not being able to move and giving other guy another turn
 				if (cur_node->player == me) //no move for me
@@ -204,7 +204,7 @@ public:
 					for (int j = 0; j < seq_len; j++) {
 						int r = sequence[seq_len][0];
 						int c = sequence[seq_len][1];
-						if (r < 8 && c < 8)
+						if (r >= 0 && c >= 0 && r < 8 && c < 8)
 							in_state[r][c] = player;
 					}
 				}
