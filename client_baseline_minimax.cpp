@@ -29,18 +29,25 @@ public:
 
 	Node* root;
 	int depth_limit;
+	unsigned int total_nodes_expanded;
+	std::string message_prefix;
 
-	ClientBaselineMiniMaxPlayer(string host, int port, int in_me, int depth_limit=7) : ClientPlayer(host, port, in_me) {
+	ClientBaselineMiniMaxPlayer(string host, int port, int in_me, int depth_limit=5) : ClientPlayer(host, port, in_me) {
 		this->depth_limit = depth_limit;
 		this->root = NULL;
+		total_nodes_expanded = 0;
+
+		stringstream ss;
+		ss << "[baseline minimax " << me << "] ";
+		message_prefix = ss.str();
 	}
 
 	virtual ~ClientBaselineMiniMaxPlayer() { }
 
 	int randomMove() {
-		std::cout << "[baseline minimax] " << "Returning random move\n";
-		std::cout << "[baseline minimax] numValidMoves: ";
-		std::cout << numValidMoves << "\n";
+		cout << message_prefix << "Returning random move\n";
+		cout << message_prefix << "numValidMoves: ";
+		cout << numValidMoves << "\n";
 		int myMove;
 		if (numValidMoves > 0) {
 			int randomIndex = rand() % numValidMoves;
@@ -53,37 +60,35 @@ public:
 	}
 
 	int move() {
-		std::cout << "[baseline minimax " << me << "] Entering move function\n";
+		cout << message_prefix << "Entering move function\n";
 		if (round < 4) {
 			//can only choose middle 4 squares, so just choose one randomly
 			return randomMove();
 		}
 		else {
 			//make the tree
-			std::cout << "[baseline minimax " << me << "] Creating minimax tree\n";
+			std::cout << message_prefix << "Creating minimax tree\n";
 
 			root = new Node(true, me, state, NULL, -1);
 			get_valid_moves(state,me);
-			std::cout << "Valid moves for root: \n";
-			for (int i = 0; i < numValidMoves; i++)
-				std::cout << (validMoves[i]/8) << "," << ( (validMoves[i]%8)) << " ; ";
+//			std::cout << "Valid moves for root: \n";
+//			for (int i = 0; i < numValidMoves; i++)
+//				std::cout << (validMoves[i]/8) << "," << ( (validMoves[i]%8)) << " ; ";
+
 			std::cout << "\n";
-			std::cout << "[baseline minimax " << me << "] Expanding root\n";
+			std::cout << message_prefix << " Expanding root\n";
+			unsigned int old_total = total_nodes_expanded;
 			expandNode(root, 1);
+			std::cout << message_prefix << " Nodes expanded on this move: " << total_nodes_expanded - old_total << "\n";
+			std::cout << message_prefix << " Total nodes expanded so far: " << total_nodes_expanded << "\n";
 
-			std::cout << "[baseline minimax " << me << "] Searching children for best node\n";
-
-			//print_nodes();
-
+			std::cout << message_prefix << " Searching children for best node\n";
 			int bestValue = INT_MIN;
 			Node* bestNode = NULL;
 			int k = 0;
-			std::cout << "root: " << root << "\n";
 			std::cout << "root children size: " << root->children.size() << "\n";
 			for (int i = 0; i < root->children.size(); i++) {
 				Node* child = root->children[i];
-				//std::cout << "child: " << child << "\n";
-				//std::cout << "child->value: " << child->value << "\n";
 				if (child->value > bestValue) {
 					bestValue = child->value;
 					bestNode = child;
@@ -96,11 +101,10 @@ public:
 				return randomMove();
 			}
 			else {
-				std::cout << "[baseline minimax] bestMove " << bestNode->moveFromParent << " val: " << bestValue << "\n";
-				//int move = bestNode->moveFromParent;
+				std::cout << message_prefix << bestNode->moveFromParent << " val: " << bestValue << "\n";
 				get_valid_moves(state,me);
 				int move = validMoves[k];
-				cout << "Returning the best move: " << move << "\n";
+				cout << message_prefix << "Returning the best move: " << move << "\n";
 				return move;
 			}
 		}
@@ -109,6 +113,7 @@ public:
 	void expandNode(Node* cur_node, int current_depth) {
 		//cout << "[baseline minimax " << me << "] Expanding " << cur_node << " at depth " << current_depth << "\n";
 
+		total_nodes_expanded++;
 		//Flip next player
 		int next_player = -1;
 		if (cur_node->player == 1)
@@ -122,7 +127,7 @@ public:
 
 			//if you reach point where no valid moves, this node would be other player's turn
 			if (numValidMoves == 0) {
-				cout << "[baseline minimax " << me << "] No valid moves at this node \n";
+				cout << message_prefix << " No valid moves at this node \n";
 
 				//discourage not being able to move and giving other guy another turn
 				if (cur_node->player == me) //no move for me
@@ -131,10 +136,6 @@ public:
 					cur_node->value = cur_node->calculateValue(me) + 120;
 				return;
 			}
-
-//			if (cur_node == self.root) {
-//				std::cout << "Valid moves for player " << cur_node.player << " : " << str(validMoves) << "\n";
-//			}
 
 			//create new nodes from validMoves
 			//cout << "    creating new nodes\n";
@@ -149,7 +150,6 @@ public:
 				}
 
 				next_state[(move/8)][(move % 8)] = cur_node->player;
-				//cout << "updating state for new node\n";
 				updateState(move,cur_node->player,next_state);
 
 				Node* next_node = new Node(!cur_node->isMax, next_player, next_state, cur_node, move);
@@ -194,8 +194,8 @@ public:
 					sequence[seq_len][1] = col;
 					seq_len++;
 					if (seq_len >= 8) {
-						cout << "WARNING: Seq len >= 8\n";
-						cout << "instate = opponent at " << row << "," << col << "\n";
+						cout << message_prefix << "WARNING: Seq len >= 8\n";
+						cout << message_prefix << "instate = opponent at " << row << "," << col << "\n";
 					}
 					row += rdir;
 					col += cdir;
