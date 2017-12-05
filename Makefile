@@ -15,7 +15,7 @@ LDFLAGS :=
 
 EXEC	:= main.exe ReversiServer.class
 OBJS:= main.o Player.class
-CPPFILES := client_player.cpp client_baseline_minimax.cpp client_random_player.cpp node.cpp main.cpp
+CPPFILES := client_player.cpp client_minimax_player.cpp client_random_player.cpp node.cpp main.cpp
 
 .DEFAULT_GOAL := all
 

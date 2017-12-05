@@ -5,10 +5,10 @@
  *      Author: derekhancock
  */
 
-#include "client_baseline_minimax.cpp"
 #include "client_random_player.cpp"
 #include <iostream>
 #include <string>
+#include "client_minimax_player.cpp"
 
 int main(int argc, char *argv[]) {
 
@@ -22,7 +22,11 @@ int main(int argc, char *argv[]) {
 		player.play();
 	}
 	else if (std::string(argv[1]) == "client_baseline_minimax") {
-		ClientBaselineMiniMaxPlayer player(argv[2],stoi(argv[3]),stoi(argv[4]),stoi(argv[5]));
+		ClientMiniMaxPlayer player(argv[2],stoi(argv[3]),stoi(argv[4]),stoi(argv[5]),false);
+		player.play();
+	}
+	else if (std::string(argv[1]) == "client_openmp_minimax") {
+		ClientMiniMaxPlayer player(argv[2],stoi(argv[3]),stoi(argv[4]),stoi(argv[5]),true);
 		player.play();
 	}
 	else {

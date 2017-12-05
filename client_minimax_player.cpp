@@ -25,7 +25,7 @@
 
 using namespace std;
 
-class ClientBaselineMiniMaxPlayer : public ClientPlayer {
+class ClientMiniMaxPlayer : public ClientPlayer {
 public:
 
 	Node* root;
@@ -34,20 +34,25 @@ public:
 	std::string message_prefix;
 	double time_left;
 	bool hit_time_limit;
+	bool run_omp;
 
-	ClientBaselineMiniMaxPlayer(string host, int port, int in_me, int depth_limit=5) : ClientPlayer(host, port, in_me) {
+	ClientMiniMaxPlayer(string host, int port, int in_me, int depth_limit=5, bool run_omp) : ClientPlayer(host, port, in_me) {
 		this->depth_limit = depth_limit;
 		this->root = NULL;
 		total_nodes_expanded = 0;
 
 		stringstream ss;
-		ss << "[baseline minimax " << me << "] ";
+		if (!run_omp)
+			ss << "[baseline minimax " << me << "] ";
+		else
+			ss << "[openmp minimax " << me << "] ";
 		message_prefix = ss.str();
 		time_left = -1;
 		hit_time_limit = false;
+		this->run_omp = run_omp;
 	}
 
-	virtual ~ClientBaselineMiniMaxPlayer() { }
+	virtual ~ClientMiniMaxPlayer() { }
 
 	int randomMove() {
 		cout << message_prefix << "Returning random move\n";
@@ -164,24 +169,31 @@ public:
 				return;
 			}
 
-			for (int i = 0; i < numValidMoves; i++) {
-				int move = validMoves[i];
+			int n = ((current_depth == 1 && run_omp) ? 8 : 1);
+			cur_node->children.reserve(numValidMoves);
 
-				int next_state[8][8];
-				for (int i = 0; i < 8; i++) {
-					for (int j = 0; j < 8; j++) {
-						next_state[i][j] = cur_node->state[i][j];
+			#pragma omp parallel num_threads(n)
+			{
+				#pragma omp for schedule(dynamic)
+				for (int i = 0; i < numValidMoves; i++) {
+					int move = validMoves[i];
+
+					int next_state[8][8];
+					for (int i = 0; i < 8; i++) {
+						for (int j = 0; j < 8; j++) {
+							next_state[i][j] = cur_node->state[i][j];
+						}
 					}
+
+					next_state[(move/8)][(move % 8)] = cur_node->player;
+					updateState(move,cur_node->player,next_state);
+
+					Node* next_node = new Node(!cur_node->isMax, next_player, next_state, cur_node, move);
+
+					cur_node->children[i] = next_node;
+
+					expandNode(next_node, current_depth + 1, sw);
 				}
-
-				next_state[(move/8)][(move % 8)] = cur_node->player;
-				updateState(move,cur_node->player,next_state);
-
-				Node* next_node = new Node(!cur_node->isMax, next_player, next_state, cur_node, move);
-				//next_node->value = next_node->getHeuristicValue(me);
-				cur_node->children.push_back(next_node);
-				//cout << "Expanding " << cur_node << " at depth " << current_depth + 1 << "\n";
-				expandNode(next_node, current_depth + 1, sw);
 			}
 
 			cur_node->calculateValue(me);
