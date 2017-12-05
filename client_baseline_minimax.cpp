@@ -21,6 +21,7 @@
 
 #include "client_player.cpp"
 #include "node.cpp"
+#include "stopwatch.hpp"
 
 using namespace std;
 
@@ -31,6 +32,8 @@ public:
 	int depth_limit;
 	unsigned int total_nodes_expanded;
 	std::string message_prefix;
+	double time_left;
+	bool hit_time_limit;
 
 	ClientBaselineMiniMaxPlayer(string host, int port, int in_me, int depth_limit=5) : ClientPlayer(host, port, in_me) {
 		this->depth_limit = depth_limit;
@@ -40,6 +43,8 @@ public:
 		stringstream ss;
 		ss << "[baseline minimax " << me << "] ";
 		message_prefix = ss.str();
+		time_left = -1;
+		hit_time_limit = false;
 	}
 
 	virtual ~ClientBaselineMiniMaxPlayer() { }
@@ -75,16 +80,20 @@ public:
 			root = new Node(true, me, state, NULL, -1);
 			int validMoves[64];
 			int numValidMoves = get_valid_moves(state, me, validMoves);
-//			std::cout << "Valid moves for root: \n";
-//			for (int i = 0; i < numValidMoves; i++)
-//				std::cout << (validMoves[i]/8) << "," << ( (validMoves[i]%8)) << " ; ";
 
 			std::cout << "\n";
 			std::cout << message_prefix << " Expanding root\n";
 			unsigned int old_total = total_nodes_expanded;
-			expandNode(root, 1);
+			time_left = (me == 1)? t1 : t2;
+			stopwatch<std::milli, double> sw;
+			sw.start();
+			expandNode(root, 1,sw);
+			sw.stop();
 			std::cout << message_prefix << " Nodes expanded on this move: " << total_nodes_expanded - old_total << "\n";
 			std::cout << message_prefix << " Total nodes expanded so far: " << total_nodes_expanded << "\n";
+			if (hit_time_limit)
+				std::cout << message_prefix << " Hit time limit on expansion\n";
+			hit_time_limit = false;
 
 			std::cout << message_prefix << " Searching children for best node\n";
 			int bestValue = INT_MIN;
@@ -100,8 +109,12 @@ public:
 				}
 			}
 
-			if (bestNode == NULL) {
+			if (bestValue == INT_MIN) {
 				//handle edge cases at end
+
+				//delete tree
+				delete root;
+
 				return randomMove();
 			}
 			else {
@@ -110,14 +123,17 @@ public:
 				int move = validMoves[k];
 				std::cout << message_prefix << "Best Move: " << (move/8) << "," << (move%8) << " val: " << bestValue << "\n";
 				//cout << message_prefix << "Returning the best move: " << move << "\n";
+
+				//delete tree
+				delete root;
+
 				return move;
 			}
 		}
 	}
 
-	void expandNode(Node* cur_node, int current_depth) {
+	void expandNode(Node* cur_node, int current_depth, stopwatch<std::milli, double>& sw) {
 		//cout << "[baseline minimax " << me << "] Expanding " << cur_node << " at depth " << current_depth << "\n";
-
 		total_nodes_expanded++;
 		//Flip next player
 		int next_player = -1;
@@ -126,7 +142,12 @@ public:
 		else
 			next_player = 1;
 
-		if (current_depth < depth_limit) {
+		sw.stop();
+		if (sw.count() > 1500) { //give max 1.5 seconds per move so finish in time
+			hit_time_limit = true;
+			cur_node->value = cur_node->getHeuristicValue(me);
+		}
+		else if (current_depth < depth_limit) {
 			//cout << "    getting valid moves\n";
 			int validMoves[64];
 			int numValidMoves = get_valid_moves(cur_node->state, cur_node->player, validMoves);
@@ -160,7 +181,7 @@ public:
 				//next_node->value = next_node->getHeuristicValue(me);
 				cur_node->children.push_back(next_node);
 				//cout << "Expanding " << cur_node << " at depth " << current_depth + 1 << "\n";
-				expandNode(next_node, current_depth + 1);
+				expandNode(next_node, current_depth + 1, sw);
 			}
 
 			cur_node->calculateValue(me);

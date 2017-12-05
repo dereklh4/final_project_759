@@ -44,7 +44,10 @@ public:
 	}
 
 	~Node() {
-		delete parent;
+		for (int i = 0; i < children.size(); i++) {
+			delete children[i];
+		}
+		children.clear();
 	}
 
 	int getHeuristicValue(int me) {
