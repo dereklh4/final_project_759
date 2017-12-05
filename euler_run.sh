@@ -1,6 +1,6 @@
 #!/bin/sh
 #SBATCH --partition=slurm_shortgpu
-#SBATCH --time=0-00:03:00 # run time in days-hh:mm:ss
+#SBATCH --time=0-00:05:00 # run time in days-hh:mm:ss
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=1
 #SBATCH --error=/srv/home/dlhancock/final_project_759/sbatch.err
@@ -28,6 +28,6 @@ echo $port2
 module load java
 java ReversiServer $port1 $port2 1 &
 sleep 2
-./main.exe client_random_player localhost $port1 1 &
+./main.exe client_random_player localhost $port1 1 -1 &
 sleep 2
-./main.exe client_baseline_minimax localhost $port2 2 >/dev/null 2>&1;
+./main.exe client_baseline_minimax localhost $port2 2 6 >/dev/null 2>&1;
