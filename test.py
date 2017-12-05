@@ -14,7 +14,7 @@ if __name__ == "__main__":
 
 	for i in xrange(num_times):
 		print("Running for " + str(i))
-		tmp = commands.getoutput("bash mac_run.sh")
+		tmp = commands.getoutput("bash local_run.sh")
 		lines = tmp.split("\n")
 		lines = lines[-20:]
 
