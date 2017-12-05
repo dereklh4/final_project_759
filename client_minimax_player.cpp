@@ -36,7 +36,7 @@ public:
 	bool hit_time_limit;
 	bool run_omp;
 
-	ClientMiniMaxPlayer(string host, int port, int in_me, int depth_limit=5, bool run_omp) : ClientPlayer(host, port, in_me) {
+	ClientMiniMaxPlayer(string host, int port, int in_me, int depth_limit=5, bool run_omp=false) : ClientPlayer(host, port, in_me) {
 		this->depth_limit = depth_limit;
 		this->root = NULL;
 		total_nodes_expanded = 0;
