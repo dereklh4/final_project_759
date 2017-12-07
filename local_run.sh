@@ -1,17 +1,17 @@
-#function random_unused_port {
-#    local port=$(shuf -i 2000-65000 -n 1)
-#    netstat -lat | grep $port > /dev/null
-#    if [[ $? == 1 ]] ; then
-#        export RANDOM_PORT=$port
-#    else
-#        random_unused_port
-#    fi
-#}
+function random_unused_port {
+    local port=$(shuf -i 2000-65000 -n 1)
+    netstat -lat | grep $port > /dev/null
+    if [[ $? == 1 ]] ; then
+        export RANDOM_PORT=$port
+    else
+        random_unused_port
+    fi
+}
 
-#random_unused_port
-port1=3333
-#random_unused_port
-port2=3334
+random_unused_port
+port1=$RANDOM_PORT
+random_unused_port
+port2=$RANDOM_PORT
 echo $port1
 echo $port2
 
