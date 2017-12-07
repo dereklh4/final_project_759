@@ -160,7 +160,7 @@ public:
 			next_player = 1;
 
 		sw.stop();
-		if (sw.count() > 4000) { //give max 2 seconds per move so finish in time
+		if (sw.count() > 2000) { //give max 2 seconds per move so finish in time
 			hit_time_limit = true;
 			cur_node->value = cur_node->getHeuristicValue(me);
 		}
