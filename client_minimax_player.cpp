@@ -35,6 +35,8 @@ public:
 	double time_left;
 	bool hit_time_limit;
 	bool run_omp;
+	int times_hit_time_limit;
+	double total_time_spent;
 
 	ClientMiniMaxPlayer(string host, int port, int in_me, int depth_limit=5, bool run_omp=false) : ClientPlayer(host, port, in_me) {
 		this->depth_limit = depth_limit;
@@ -50,6 +52,8 @@ public:
 		time_left = -1;
 		hit_time_limit = false;
 		this->run_omp = run_omp;
+		times_hit_time_limit = 0;
+		total_time_spent = 0;
 	}
 
 	virtual ~ClientMiniMaxPlayer() { }
@@ -64,6 +68,7 @@ public:
 		int myMove;
 		if (numValidMoves > 0) {
 			int randomIndex = rand() % numValidMoves;
+			//int randomIndex = 17 % numValidMoves; //to make repatable. DELETE ME LATER
 			myMove = validMoves[randomIndex];
 		}
 		else {
@@ -94,10 +99,17 @@ public:
 			sw.start();
 			expandNode(root, 1,sw);
 			sw.stop();
+			total_time_spent += sw.count();
 			std::cout << message_prefix << " Nodes expanded on this move: " << total_nodes_expanded - old_total << "\n";
 			std::cout << message_prefix << " Total nodes expanded so far: " << total_nodes_expanded << "\n";
-			if (hit_time_limit)
+			std::cout << message_prefix << " Time spent on this move: " << sw.count() << "\n";
+			if (hit_time_limit) {
 				std::cout << message_prefix << " Hit time limit on expansion\n";
+				times_hit_time_limit++;
+			}
+			std::cout << message_prefix << " Times hit time limit: " << times_hit_time_limit << "\n";
+			std::cout << message_prefix << " Total time spent so far: " << total_time_spent << "\n";
+			std::cout << message_prefix << " Current node/time spent ratio: " << total_nodes_expanded/total_time_spent << "\n";
 			hit_time_limit = false;
 
 			std::cout << message_prefix << " Searching children for best node\n";
@@ -148,7 +160,7 @@ public:
 			next_player = 1;
 
 		sw.stop();
-		if (sw.count() > 1500) { //give max 1.5 seconds per move so finish in time
+		if (sw.count() > 4000) { //give max 2 seconds per move so finish in time
 			hit_time_limit = true;
 			cur_node->value = cur_node->getHeuristicValue(me);
 		}
@@ -169,13 +181,15 @@ public:
 				return;
 			}
 
-			int n = ((current_depth == 1 && run_omp) ? 8 : 1);
+			int n = ((current_depth == 1 && run_omp) ? 4 : 1);
 			cur_node->children.reserve(numValidMoves);
 
 			#pragma omp parallel num_threads(n)
 			{
 				#pragma omp for schedule(dynamic)
 				for (int i = 0; i < numValidMoves; i++) {
+					//if (current_depth == 1 && run_omp)
+					//	cout << "Starting " << i << ", N is " << n << "\n";
 					int move = validMoves[i];
 
 					int next_state[8][8];
@@ -193,6 +207,8 @@ public:
 					cur_node->children[i] = next_node;
 
 					expandNode(next_node, current_depth + 1, sw);
+					//if (current_depth == 1 && run_omp)
+					//	cout << "Ending " << i << "\n";
 				}
 			}
 

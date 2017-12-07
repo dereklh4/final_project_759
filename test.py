@@ -18,12 +18,12 @@ if __name__ == "__main__":
 		print("Running for " + str(i))
 		tmp = commands.getoutput("bash local_run.sh")
 		lines = tmp.split("\n")
-		lines = lines[-20:]
+		lines = lines[-40:]
 
 		black_time = 0
 		white_time = 0
 		#find the count
-		for x in xrange(19,0,-1):
+		for x in xrange(39,0,-1):
 			try:
 				line = lines[x]
 			except:

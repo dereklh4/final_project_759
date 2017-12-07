@@ -2,7 +2,7 @@
 WFLAGS	:= #-Wall -Wextra -Wsign-conversion -Wsign-compare
 
 # Optimization and architecture
-OPT		:= -O3 -g
+OPT		:= -O3 -g -fopenmp
 ARCH   	:= -march=native
 
 # Language standard
@@ -11,7 +11,7 @@ CXXSTD	:= -std=c++11
 
 # Linker options
 LDOPT 	:= $(OPT)
-LDFLAGS :=
+LDFLAGS := -fopenmp
 
 EXEC	:= main.exe ReversiServer.class
 OBJS:= main.o Player.class
