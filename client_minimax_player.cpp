@@ -181,8 +181,8 @@ public:
 				return;
 			}
 
-			int n = ((current_depth == 1 && run_omp) ? 4 : 1);
-			cur_node->children.reserve(numValidMoves);
+			int n = ((current_depth == 1 && run_omp) ? 6 : 1);
+			//cur_node->children.reserve(numValidMoves);
 
 			#pragma omp parallel num_threads(n)
 			{
@@ -204,7 +204,9 @@ public:
 
 					Node* next_node = new Node(!cur_node->isMax, next_player, next_state, cur_node, move);
 
-					cur_node->children[i] = next_node;
+					#pragma omp critical
+					cur_node->children.push_back(next_node);
+					//cur_node->children[i] = next_node;
 
 					expandNode(next_node, current_depth + 1, sw);
 					//if (current_depth == 1 && run_omp)
