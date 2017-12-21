@@ -3,7 +3,8 @@
 This project has the server/client code necessary to play two minimax agents against each other. There are 3 agents available:
 1. client_random_player - makes moves randomly throughout the game
 2. client_baseline_minimax - uses minimax to make moves but doesn't use parallelization
-3. client_openmp_minimax - Uses OpenMP and minimax to determine its moves
+3. client_openmp_minimax - Uses OpenMP and minimax to determine its moves  
+
 note that client_minimax_player contains the code for baseline minimax as well as openmp minimax
 
 ## Running the Code
