@@ -20,7 +20,7 @@ On euler, there are two main ways to run the code. Option 1 is probably the easi
   - run "sbatch euler_run.sh" to submit the job
   - Observe the results in the output file
     
-You can observe the output as the code is running and once it finishes. It shows the current state of the board, the time left for each player, the number of nodes expanded per millisecond for the openmp agent, how many pieces each player has, and other information. 
+You can observe the output as the code is running and once it finishes. It shows the current state of the board, the time left for each player, the number of nodes expanded per millisecond for the openmp agent, how many pieces each player has on the board, and other information. 
 
 Note that black is player 1 and white is player 2. At each spot on the board it shows a 1 for player 1, 2 for player 2, or 0 if it is empty. 
 
