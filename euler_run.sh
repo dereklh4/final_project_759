@@ -30,6 +30,6 @@ make
 
 java ReversiServer $port1 $port2 1 &
 sleep 2
-./main.exe client_baseline_minimax localhost $port1 1 6 &
+./main.exe client_baseline_minimax localhost $port1 1 6 >/dev/null 2>&1 &
 sleep 2
 ./main.exe client_openmp_minimax localhost $port2 2 6;

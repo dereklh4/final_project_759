@@ -55,10 +55,10 @@ public:
 
 		int myMove;
 		while (true) {
-			cout << "[client " << me << "] " << "Waiting for message\n";
+			//cout << "[client " << me << "] " << "Waiting for message\n";
 
 			bool success = read_message(sockfd);
-			cout << "[client " << me << "] " << "Finished read message\n";
+			//cout << "[client " << me << "] " << "Finished read message\n";
 
 			if (!success && turn != -999) {
 				cout << "[client " << me << "] "
@@ -66,17 +66,16 @@ public:
 				break;
 			}
 
-			cout << "[client " << me << "] " << "Turn: " << turn << endl;
-			cout << "[client " << me << "] " << "Me: " << me << endl;
+			//cout << "[client " << me << "] " << "Turn: " << turn << endl;
+			//cout << "[client " << me << "] " << "Me: " << me << endl;
 			if (turn == me) {
 				//cout << "[client " << me << "] " << "Getting valid states\n";
 				//get_valid_moves(state, me);
 
-				cout << "[client " << me << "] " << "Getting move\n";
+				//cout << "[client " << me << "] " << "Getting move\n";
 				myMove = move();
 
-				cout << "[client " << me << "] " << "Packaging up move "
-						<< myMove << "\n";
+				//cout << "[client " << me << "] " << "Packaging up move " << myMove << "\n";
 				std::stringstream ss;
 				if (myMove == -1)
 					ss << -1 << "\n" << -1 << "\n";
@@ -84,19 +83,16 @@ public:
 					ss << myMove / 8 << "\n" << myMove % 8 << "\n";
 				string sel = ss.str();
 
-				cout << "[client " << me << "] " << "\nSelection: "
-						<< myMove / 8 << "," << myMove % 8 << "\n";
-				cout << "[client " << me << "] " << "Sending: " << "\n" << sel
-						<< "\n";
+				//cout << "[client " << me << "] " << "\nSelection: " << myMove / 8 << "," << myMove % 8 << "\n";
+				//cout << "[client " << me << "] " << "Sending: " << "\n" << sel << "\n";
 
 				send(sockfd, sel.c_str(), sizeof(sel), 0);
 
 			} else if (turn == -999) {
-				cout << "[client " << me << "] "
-						<< "Told that the game is over\n";
+				cout << "[client " << me << "] " << "Told that the game is over\n";
 				return;
 			} else {
-				cout << "[client " << me << "] " << "Not my turn\n\n";
+				// cout << "[client " << me << "] " << "Not my turn\n\n";
 			}
 		}
 	}
@@ -133,24 +129,24 @@ public:
 			turn = stoi(line);
 
 			if (turn == -999) {
-				cout << "[client " << me << "] " << "Got that turn is -999\n";
+				cout << "[client " << me << "] " << "Got that turn is -999 (game is over) \n";
 				return false;
 			}
 
-			cout << "[client " << me << "] " << "Turn: " << turn << "\n";
+			//cout << "[client " << me << "] " << "Turn: " << turn << "\n";
 			std::getline(ss, line);
 			round = stoi(line);
-			cout << "[client " << me << "] " << "Round: " << round << "\n";
+			//cout << "[client " << me << "] " << "Round: " << round << "\n";
 			if (result == 4) {
-				cout << "[client " << me << "] " << "End of stream\n";
+				//cout << "[client " << me << "] " << "End of stream\n";
 				return true;
 			}
 			std::getline(ss, line);
 			t1 = atof(line.c_str());
-			cout << "t1: " << t1 << "\n";
+			//cout << "t1: " << t1 << "\n";
 			std::getline(ss, line);
 			t2 = atof(line.c_str());
-			cout << "t2:" << t2 << "\n";
+			//cout << "t2:" << t2 << "\n";
 			for (i = 0; i < 8; i++) {
 				for (j = 0; j < 8; j++) {
 					std::getline(ss, line);
@@ -167,7 +163,7 @@ public:
 		cout << "State:\n";
 		for (i = 7; i >= 0; i--) {
 			for (j = 0; j < 8; j++) {
-				cout << state[i][j];
+				cout << state[i][j] << " ";
 			}
 			cout << endl;
 		}

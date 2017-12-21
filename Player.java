@@ -144,11 +144,11 @@ public class Player {
         getValidMoves(round, state);
         
         int i, j;
-        prnt.println("Valid moves for " + me + ":");
-        for (i = 0; i < numValidMoves; i++) {
-            prnt.println((validMoves[i] / 8) + ", " + (validMoves[i] % 8));
-        }
-        prnt.println();
+        //prnt.println("Valid moves for " + me + ":");
+        //for (i = 0; i < numValidMoves; i++) {
+        //    prnt.println((validMoves[i] / 8) + ", " + (validMoves[i] % 8));
+        //}
+        //prnt.println();
         
         if (numValidMoves == 0) {
             int mueva[] = new int[2];
@@ -184,15 +184,15 @@ public class Player {
                     s = s.substring(start,s.length());
                 }
                 row = Integer.parseInt(s);
-                System.out.println("[ServerPlayer]    Row: "  + row);
+                //System.out.println("[ServerPlayer]    Row: "  + row);
                 
                 s = sin.readLine();
                 s = s.trim();
                 col = Integer.parseInt(s);
-                System.out.println("[ServerPlayer]    Col: "  + col);
+                //System.out.println("[ServerPlayer]    Col: "  + col);
 
                 if (row == -1 && col == -1) {
-                    System.out.println("[ServerPlayer] Got -1,-1");
+                    //System.out.println("[ServerPlayer] Got -1,-1");
                     mueva[0] = -1;
                     mueva[1] = -1;
                     return mueva;
@@ -232,7 +232,7 @@ public class Player {
             }
         }
         sout.println(status);
-        System.out.println("[ServerPlayer] " + "Sent status update");
+        //System.out.println("[ServerPlayer] " + "Sent status update");
     }
     
     public void gameOver(int state[][]) {
