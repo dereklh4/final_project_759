@@ -10,7 +10,7 @@ note that client_minimax_player contains the code for baseline minimax as well a
 ## Running the Code
 In order to run the code, you need to start up 3 processes -- one for the server, and one for each of the clients. To simplify things, I have a bash script that will start the processes up for you. The default bash script starts a 1 minute game server on 2 free ports, starts a client_baseline_minimax player 1 (black) with a max depth of 6, and starts a client_openmp_minimax player 2 (white) with a max depth of 6.
 
-On euler, there are two main ways to run the code. Option 1 is probably the easiest:
+On euler, there are two main ways to run the code. Both scripts automaticaly load the necessary modules, compile the code, and then runs it. Option 1 is probably the easiest:
 1. Use an interactive session.  
   - Run "srun -p slurm_shortgpu -c 20 --pty -u bash -i" to start an interactive session
   - Run "bash local_run.sh"
