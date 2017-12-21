@@ -38,6 +38,13 @@ public:
 	int times_hit_time_limit;
 	double total_time_spent;
 
+	/**
+	 * host - The host to connect to
+	 * port - the port to connect to
+	 * in_me - the player number that this player is
+	 * depth_limit - the max depth that the minimax algorithm should explore to
+	 * run_omp - specifies whether this agent uses openmp parallelization or not
+	 */
 	ClientMiniMaxPlayer(string host, int port, int in_me, int depth_limit=5, bool run_omp=false) : ClientPlayer(host, port, in_me) {
 		this->depth_limit = depth_limit;
 		this->root = NULL;
@@ -58,6 +65,9 @@ public:
 
 	virtual ~ClientMiniMaxPlayer() { }
 
+	/**
+	 * Makes a random move. Only used at the beginning of the game
+	 */
 	int randomMove() {
 		cout << message_prefix << "Returning random move\n";
 		int validMoves[64];
@@ -77,6 +87,9 @@ public:
 		return myMove;
 	}
 
+	/**
+	 * Make a move by expanding the tree, using minimax, and finding the best child node
+	 */
 	int move() {
 		cout << message_prefix << "Entering move function\n";
 		if (round < 4) {
@@ -100,6 +113,8 @@ public:
 			expandNode(root, 1,sw);
 			sw.stop();
 			total_time_spent += sw.count();
+
+			//print useful information on the expansion
 			std::cout << message_prefix << " Nodes expanded on this move: " << total_nodes_expanded - old_total << "\n";
 			std::cout << message_prefix << " Total nodes expanded so far: " << total_nodes_expanded << "\n";
 			std::cout << message_prefix << " Time spent on this move: " << sw.count() << "\n";
@@ -112,6 +127,7 @@ public:
 			std::cout << message_prefix << " Current node/time spent ratio: " << total_nodes_expanded/total_time_spent << "\n";
 			hit_time_limit = false;
 
+			//get best child node and return it
 			std::cout << message_prefix << " Searching children for best node\n";
 			int bestValue = INT_MIN;
 			Node* bestNode = NULL;
@@ -139,7 +155,6 @@ public:
 				int numValidMoves = get_valid_moves(state, me, validMoves);
 				int move = validMoves[k];
 				std::cout << message_prefix << "Best Move: " << (move/8) << "," << (move%8) << " val: " << bestValue << "\n";
-				//cout << message_prefix << "Returning the best move: " << move << "\n";
 
 				//delete tree
 				delete root;
@@ -149,8 +164,10 @@ public:
 		}
 	}
 
+	/**
+	 * Expand the current node and all of its children recursively until it reaches the max depth
+	 */
 	void expandNode(Node* cur_node, int current_depth, stopwatch<std::milli, double>& sw) {
-		//cout << "[baseline minimax " << me << "] Expanding " << cur_node << " at depth " << current_depth << "\n";
 		total_nodes_expanded++;
 		//Flip next player
 		int next_player = -1;
@@ -165,7 +182,6 @@ public:
 			cur_node->value = cur_node->getHeuristicValue(me);
 		}
 		else if (current_depth < depth_limit) {
-			//cout << "    getting valid moves\n";
 			int validMoves[64];
 			int numValidMoves = get_valid_moves(cur_node->state, cur_node->player, validMoves);
 
@@ -188,8 +204,6 @@ public:
 			{
 				#pragma omp for schedule(dynamic)
 				for (int i = 0; i < numValidMoves; i++) {
-					//if (current_depth == 1 && run_omp)
-					//	cout << "Starting " << i << ", N is " << n << "\n";
 					int move = validMoves[i];
 
 					int next_state[8][8];
@@ -209,21 +223,21 @@ public:
 					//cur_node->children[i] = next_node;
 
 					expandNode(next_node, current_depth + 1, sw);
-					//if (current_depth == 1 && run_omp)
-					//	cout << "Ending " << i << "\n";
 				}
 			}
 
 			cur_node->calculateValue(me);
 		}
 		else {
-			//cout << "No valid moves, so just calculating value\n";
 			cur_node->calculateValue(me);
 		}
 	}
 
+	/**
+	 * Given a move, a state, and the player making the move, update the board with the necessary
+	 * flips as specified in the Othello rules
+	 */
 	void updateState(int move,int player,int in_state[8][8]) {
-		//std::cout << "updating state\n";
 		int opponent = -1;
 		if (player == 1)
 			opponent = 2;
@@ -231,9 +245,7 @@ public:
 			opponent = 1;
 		}
 		int directions[8][2] = {{1,0},{0,1},{0,-1},{-1,0},{1,1},{1,-1},{-1,1},{-1,-1}};
-		//std::cout << "exploring each direction\n";
 		for (int i = 0; i < 8; i++) {
-			//std::cout << "  " << i << "\n";
 			int rdir = directions[i][0];
 			int cdir = directions[i][1];
 
@@ -269,9 +281,11 @@ public:
 		}
 	}
 
+	/**
+	 * Simple debugging function to show a few levels of the minimax tree
+	 */
 	void print_nodes() {
 		for (int i = 0; i < root->children.size(); i++) {
-			//std::cout << "    " << root->children[i]->moveFromParent << "\n";
 			std::cout << "    node: " << root->children[i]->value << "\n";
 			for (int j = 0; j < root->children[i]->children.size(); j++) {
 				std::cout << "        node: " << root->children[i]->children[j]->value << "\n";
