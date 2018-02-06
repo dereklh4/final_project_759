@@ -1,4 +1,6 @@
-# 759 Final Project - Derek Hancock
+# Parallel Minimax Reversi
+
+*This code was originally written to run some experiments on a HPC platform (euler) at UW-Madison
 
 This project has the server/client code necessary to play two minimax agents against each other. There are 3 agents available:
 1. client_random_player - makes moves randomly throughout the game
